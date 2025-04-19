@@ -1,0 +1,68 @@
+name: Compile
+
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: 'Compile from (tag, branch, sha)'
+        required: true
+        type: string
+        default: 'v0.82'
+      pageant:
+        description: 'pageant'
+        required: false
+        type: boolean
+      plink:
+        description: 'plink'
+        required: false
+        type: boolean
+      pscp:
+        description: 'pscp'
+        required: false
+        type: boolean
+      psftp:
+        description: 'psftp'
+        required: false
+        type: boolean
+      putty:
+        description: 'putty'
+        required: false
+        type: boolean
+        default: true
+
+concurrency:
+  group: ${{github.workflow}}-${{github.ref}}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-2019
+    # runs-on: windows-2022
+    # runs-on: windows-2025
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.source }}
+
+
+    - name: Compile
+      run: |
+        cd src\putty
+        Copy-Item ..\portaputty\* . -Recurse -Force
+        cmake .
+        cmake --build . --config Release ${env:pageant} ${env:plink} ${env:pscp} ${env:psftp} ${env:putty} -j
+      env:
+        # -v is needed because the empty string don't work
+        pageant: ${{ inputs.pageant && '-t pageant' || '-v' }}
+        plink:   ${{ inputs.plink   && '-t plink'   || '-v' }}
+        pscp:    ${{ inputs.pscp    && '-t pscp'    || '-v' }}
+        psftp:   ${{ inputs.psftp   && '-t psftp'   || '-v' }}
+        putty:   ${{ inputs.putty   && '-t putty'   || '-v' }}
+
+    - name: Upload binaries
+      uses: actions/upload-artifact@v4
+      with:
+        path: src/putty/Release/*.exe
