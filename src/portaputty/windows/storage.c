@@ -4,7 +4,7 @@
  */
 
  /*
-  * JK: disk config 0.24 from 8. 12. 2024
+  * JK: disk config 0.25 from 22. 4. 2025
   *
   * rewritten for storing information primary to disk
   * reasonable error handling and reporting except for
