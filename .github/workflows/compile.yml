@@ -43,7 +43,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         ref: ${{ inputs.source }}
 
@@ -63,6 +63,6 @@ jobs:
         putty:   ${{ inputs.putty   && '-t putty'   || '-v' }}
 
     - name: Upload binaries
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         path: src/putty/Release/*.exe
